@@ -17,18 +17,21 @@ class Renderer(object):
 
     def renderAll(self):
         self._cleanupTarget()
+        folder = os.path.relpath(self.templatePath,
+                                 os.path.dirname(self.templatePath))
         for t in self.env.list_templates():
             template = self.env.get_template(t)
             path = os.path.realpath(os.path.join(self.targetPath,
-                                                 self.templatePath,
+                                                 folder,
                                                  t))
-            os.makedirs(os.path.dirname(path))
+            if not os.path.exists(path):
+                os.makedirs(os.path.dirname(path))
             with file(path, 'w+') as f:
                 template.stream(self.context).dump(f)
 
     def _cleanupTarget(self):
-        shutil.rmtree(os.path.join(self.targetPath, self.templatePath),
-                      True)
+        for subdir in os.listdir(self.targetPath):
+            shutil.rmtree(subdir, True)
 
     def _buildEnv(self):
         loader = loader = FileSystemLoader(self.templatePath)
