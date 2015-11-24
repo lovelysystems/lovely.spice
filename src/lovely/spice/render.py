@@ -66,12 +66,18 @@ class PyReader(object):
 def main():
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(
-        description="Render templates into target folder",
+        description="Render templates with given context into target folder",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
-    parser.add_argument('template_path')
-    parser.add_argument('context_path')
-    parser.add_argument('target_path')
+    parser.add_argument(
+        'template_path',
+        help='The directory containing the templates to use.')
+    parser.add_argument(
+        'context_path',
+        help='The path to the python file defining the context.')
+    parser.add_argument(
+        'target_path',
+        help='The directory where the rendered files will be stored.')
     args = parser.parse_args()
     Renderer(args.template_path,
              args.context_path,
