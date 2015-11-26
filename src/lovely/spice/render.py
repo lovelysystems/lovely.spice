@@ -6,6 +6,9 @@ import shutil
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
+logger = logging.getLogger(__name__)
+
+
 class Renderer(object):
 
     def __init__(self, templatePath, contextPath, targetPath):
@@ -24,14 +27,19 @@ class Renderer(object):
             path = os.path.realpath(os.path.join(self.targetPath,
                                                  folder,
                                                  t))
-            if not os.path.exists(path):
-                os.makedirs(os.path.dirname(path))
+            parent = os.path.dirname(path)
+            if not os.path.exists(parent):
+                logger.debug('creating folder %s', parent)
+                os.makedirs(parent)
             with file(path, 'w+') as f:
+                logger.debug('generating %s', t)
                 template.stream(self.context).dump(f)
 
     def _cleanupTarget(self):
         for subdir in os.listdir(self.targetPath):
-            shutil.rmtree(subdir, True)
+            path = os.path.abspath(os.path.join(self.targetPath, subdir))
+            logger.debug('removing folder %s', path)
+            shutil.rmtree(path)
 
     def _buildEnv(self):
         loader = loader = FileSystemLoader(self.templatePath)
@@ -67,7 +75,7 @@ class PyReader(object):
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(
         description="Render templates with given context into target folder",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
