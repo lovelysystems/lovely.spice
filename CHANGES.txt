@@ -2,6 +2,12 @@
 Changes for lovely.spice
 ========================
 
+2015/11/26 0.0.3
+================
+
+ - included required versions.cfg in MANIFEST.in
+
+
 2015/11/26 0.0.2
 ================
 
