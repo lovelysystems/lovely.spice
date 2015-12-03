@@ -1,6 +1,60 @@
+==============
+renderer tests
+==============
+
+The Renderer
 ============
-The renderer
-============
+
+A Renderer class is one generic implementation to render templates located in
+the given template environment to one defined path.
+
+To use a renderer we need a template environment. This can be created by the
+function `loadEnv`::
+
+    >>> import os
+    >>> import tempfile
+    >>> b = tempfile.mkdtemp(prefix='templates_')
+    >>> with open(os.path.join(b, 'one.ini'), 'w+') as f:
+    ...     f.write('one {{var}}')
+
+    >>> from lovely.spice import render
+    >>> env = render.loadEnv(b)
+    >>> env
+    <jinja2.environment.Environment object at 0x...>
+
+    >>> env.list_templates()
+    ['one.ini']
+
+the sencond required parameter for a Renderer is the context. A context can by
+loaded by the PyReader class::
+
+    >>> cdir = tempfile.mkdtemp()
+    >>> c = os.path.join(cdir, 'context.py')
+    >>> with open(c, 'w+') as f:
+    ...     f.write('var = "eins"')
+
+    >>> context = render.PyReader.loadFile(c)
+    >>> context
+    {'var': 'eins'}
+
+The renderer supports one public method called `render`. This method renders
+the template with the given name located in the initially given template
+envinronment to the given target path::
+
+    >>> t = tempfile.mktemp()
+    >>> renderer = render.Renderer(env, context)
+    >>> renderer.render('one.ini', t)
+    >>> with open(t, "r") as f:
+    ...     f.read()
+    'one eins'
+
+
+The FolderRenderer
+==================
+
+The FolderRenderer is one specific renderer to render *all* templates from
+given template folder recoursively into target folder by using a context
+loaded from the given context.
 
 Create one template folder (b), one context file (c) and one target folder
 (t). The template folder (b) contains one template called 'one.ini' and the
@@ -22,8 +76,7 @@ context file will provide the required variable called 'var'::
 Now initialize one renderer and render all templates within the given template
 folder::
 
-    >>> from lovely.spice import render
-    >>> r = render.Renderer(b, c, t)
+    >>> r = render.FolderRenderer(b, c, t)
     >>> r.renderAll()
 
 The target folder will now contain a subfolder called like the given template
@@ -46,7 +99,7 @@ If one template requires one not existing variable the renderer will fail::
     >>> with open(os.path.join(b, 'one.ini'), 'w+') as f:
     ...     f.write('one {{varX}}')
 
-    >>> r = render.Renderer(b, c, t)
+    >>> r = render.FolderRenderer(b, c, t)
     >>> r.renderAll()
     Traceback (most recent call last):
     UndefinedError: 'varX' is undefined
@@ -61,7 +114,7 @@ The given context file might contain imports of other files::
     >>> with open(common, 'w+') as f:
     ...     f.write('varX = "exists"')
 
-    >>> r = render.Renderer(b, c, t)
+    >>> r = render.FolderRenderer(b, c, t)
     >>> r.renderAll()
 
     >>> with open(os.path.join(t, folder, 'one.ini'), 'r') as f:

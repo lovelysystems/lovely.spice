@@ -2,6 +2,9 @@
 Changes for lovely.spice
 ========================
 
+ - refactored renderer to support single template rendering with custom
+   context
+
 2015/11/26 0.0.3
 ================
 
