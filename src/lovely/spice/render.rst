@@ -77,7 +77,7 @@ Now initialize one renderer and render all templates within the given template
 folder::
 
     >>> r = render.FolderRenderer(b, c, t)
-    >>> r.renderAll()
+    >>> r.render()
 
 The target folder will now contain a subfolder called like the given template
 folder and within that folder is the generated file::
@@ -100,9 +100,16 @@ If one template requires one not existing variable the renderer will fail::
     ...     f.write('one {{varX}}')
 
     >>> r = render.FolderRenderer(b, c, t)
-    >>> r.renderAll()
+    >>> r.render()
     Traceback (most recent call last):
     UndefinedError: 'varX' is undefined
+
+The created files in the target folder will have the same filename as their
+templates so the templatePath MUST NOT be same as the targetPath::
+
+    >>> r = render.FolderRenderer(b, c, b)
+    Traceback (most recent call last):
+    Exception: templatePath MUST NOT be targetPath
 
 The given context file might contain imports of other files::
 
@@ -115,9 +122,29 @@ The given context file might contain imports of other files::
     ...     f.write('varX = "exists"')
 
     >>> r = render.FolderRenderer(b, c, t)
-    >>> r.renderAll()
+    >>> r.render()
 
     >>> with open(os.path.join(t, folder, 'one.ini'), 'r') as f:
     ...     print f.read()
     one exists
 
+
+The FileRenderer
+================
+
+The FileRenderer is one specific renderer to render *one* template from
+given templatePath into targetPath by using a context
+loaded from the given context::
+
+    >>> r = render.FileRenderer(b + '/one.ini', c, t + "/rendered.ini")
+    >>> r.render()
+
+    >>> with open(os.path.join(t, 'rendered.ini'), 'r') as f:
+    ...     print f.read()
+    one exists
+
+The templatePath and the targetPath MUST NOT be equal::
+
+    >>> r = render.FileRenderer(b + '/one.ini', c, b + "/one.ini")
+    Traceback (most recent call last):
+    Exception: templateFile MUST NOT be targetFile

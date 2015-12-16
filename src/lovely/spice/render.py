@@ -3,6 +3,7 @@ import os.path
 import argparse
 import logging
 import shutil
+from os.path import abspath, dirname, basename, relpath, realpath
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
@@ -18,38 +19,62 @@ def loadEnv(path):
 
 class FolderRenderer(object):
     """ Render all templates to target
+
+    The created files in target will have the same filename as the template so
+    templatePath MUST NOT be the same as targetPath!
     """
 
     def __init__(self, templatePath, contextPath, targetPath):
+        if (abspath(templatePath) == abspath(targetPath)):
+            raise Exception("templatePath MUST NOT be targetPath")
         self.templatePath = templatePath
         self.targetPath = targetPath
         self.contextPath = contextPath
 
-    def renderAll(self):
+    def render(self):
         self._cleanupTarget()
-        folder = os.path.relpath(self.templatePath,
-                                 os.path.dirname(self.templatePath))
+        folder = relpath(self.templatePath, dirname(self.templatePath))
         context = PyReader.loadFile(self.contextPath)
         env = loadEnv(self.templatePath)
         renderer = Renderer(env, context)
         for t in env.list_templates():
-            path = os.path.realpath(os.path.join(self.targetPath,
-                                                 folder,
-                                                 t))
+            path = realpath(os.path.join(self.targetPath, folder, t))
             self._createContainingFolder(path)
             renderer.render(t, path)
 
     def _createContainingFolder(self, path):
-        parent = os.path.dirname(path)
+        parent = dirname(path)
         if not os.path.exists(parent):
             logger.debug('creating folder %s', parent)
             os.makedirs(parent)
 
     def _cleanupTarget(self):
         for subdir in os.listdir(self.targetPath):
-            path = os.path.abspath(os.path.join(self.targetPath, subdir))
+            path = abspath(os.path.join(self.targetPath, subdir))
             logger.debug('removing folder %s', path)
             shutil.rmtree(path)
+
+
+class FileRenderer(object):
+    """ Render given template to target
+
+    The given templateFile and targetFile MUST NOT be equal!
+    """
+
+    def __init__(self, templateFile, contextPath, targetFile):
+        if (abspath(templateFile) == abspath(targetFile)):
+            raise Exception("templateFile MUST NOT be targetFile")
+        self.templateFile = templateFile
+        self.templatePath = dirname(templateFile)
+        self.targetFile = targetFile
+        self.contextPath = contextPath
+
+    def render(self):
+        context = PyReader.loadFile(self.contextPath)
+        env = loadEnv(self.templatePath)
+        renderer = Renderer(env, context)
+        t = env.get_template(basename(self.templateFile))
+        renderer.render(t, self.targetFile)
 
 
 class Renderer(object):
@@ -61,7 +86,7 @@ class Renderer(object):
     def render(self, tempPath, targetPath):
         template = self.env.get_template(tempPath)
         with file(targetPath, 'w+') as f:
-            logger.debug('generating %s', tempPath)
+            logger.debug('generating %s', targetPath)
             template.stream(self.context).dump(f)
 
 
@@ -69,7 +94,7 @@ class PyReader(object):
 
     @classmethod
     def loadFile(cls, path, l={}, g={}):
-        absPath = os.path.abspath(path)
+        absPath = abspath(path)
         with file(absPath, 'rb') as f:
             return cls.load(f)
 
@@ -92,7 +117,7 @@ class PyReader(object):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(
         description="Render templates with given context into target folder",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -107,7 +132,11 @@ def main():
         'target_path',
         help='The directory where the rendered files will be stored.')
     args = parser.parse_args()
-    FolderRenderer(
+    if os.path.isdir(args.template_path):
+        renderCls = FolderRenderer
+    else:
+        renderCls = FileRenderer
+    renderCls(
         args.template_path,
         args.context_path,
-        args.target_path).renderAll()
+        args.target_path).render()
