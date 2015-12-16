@@ -2,6 +2,9 @@
 Changes for lovely.spice
 ========================
 
+2015/12/16 0.0.5
+================
+
  - added FileRenderer to support rendering of single templates by CLI
 
 2015/12/03 0.0.4
