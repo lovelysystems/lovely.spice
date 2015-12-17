@@ -2,6 +2,9 @@
 Changes for lovely.spice
 ========================
 
+2015/12/17 0.1.0
+================
+
  - ignore errors during cleanup
 
  - BREAKING CHANGE
