@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def loadEnv(path):
     """ Load environment for given path
     """
-    loader = loader = FileSystemLoader(path)
+    loader = FileSystemLoader(path, followlinks=True)
     return Environment(loader=loader, undefined=StrictUndefined)
 
 

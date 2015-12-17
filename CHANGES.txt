@@ -2,6 +2,8 @@
 Changes for lovely.spice
 ========================
 
+ - loader must follow symlinks
+
 2015/12/16 0.0.5
 ================
 

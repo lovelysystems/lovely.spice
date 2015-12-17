@@ -25,6 +25,16 @@ function `loadEnv`::
     >>> env.list_templates()
     ['one.ini']
 
+The template environment does also follow symlinks::
+
+    >>> source = os.path.join(b, 'one.ini')
+    >>> target = os.path.join(b, 'two.ini')
+    >>> os.symlink(source, target)
+
+    >>> env = render.loadEnv(b)
+    >>> env.list_templates()
+    ['one.ini', 'two.ini']
+
 the sencond required parameter for a Renderer is the context. A context can by
 loaded by the PyReader class::
 
