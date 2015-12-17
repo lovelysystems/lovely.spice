@@ -3,7 +3,7 @@ import os.path
 import argparse
 import logging
 import shutil
-from os.path import abspath, dirname, basename, relpath, realpath
+from os.path import abspath, dirname, basename, realpath
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
@@ -33,12 +33,11 @@ class FolderRenderer(object):
 
     def render(self):
         self._cleanupTarget()
-        folder = relpath(self.templatePath, dirname(self.templatePath))
         context = PyReader.loadFile(self.contextPath)
         env = loadEnv(self.templatePath)
         renderer = Renderer(env, context)
         for t in env.list_templates():
-            path = realpath(os.path.join(self.targetPath, folder, t))
+            path = realpath(os.path.join(self.targetPath, t))
             self._createContainingFolder(path)
             renderer.render(t, path)
 

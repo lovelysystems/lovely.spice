@@ -2,6 +2,9 @@
 Changes for lovely.spice
 ========================
 
+ - BREAKING CHANGE
+   do not create subfolder in targetDir named like sourceDir
+
  - loader must follow symlinks
 
 2015/12/16 0.0.5

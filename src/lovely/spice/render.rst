@@ -94,13 +94,11 @@ folder and within that folder is the generated file::
 
     >>> for f in os.walk(t):
     ...     print f
-    ('.../target_...', ['templates_...'], [])
-    ('.../target_.../templates_...', [], ['one.ini'])
+    ('.../target_...', [], ['one.ini'])
 
 The template has been rendered properly::
 
-    >>> folder = os.path.relpath(b, os.path.dirname(b))
-    >>> with open(os.path.join(t, folder, 'one.ini'), 'r') as f:
+    >>> with open(os.path.join(t, 'one.ini'), 'r') as f:
     ...     print f.read()
     one eins
 
@@ -134,7 +132,7 @@ The given context file might contain imports of other files::
     >>> r = render.FolderRenderer(b, c, t)
     >>> r.render()
 
-    >>> with open(os.path.join(t, folder, 'one.ini'), 'r') as f:
+    >>> with open(os.path.join(t, 'one.ini'), 'r') as f:
     ...     print f.read()
     one exists
 
