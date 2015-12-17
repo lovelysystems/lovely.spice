@@ -2,6 +2,8 @@
 Changes for lovely.spice
 ========================
 
+ - ignore errors during cleanup
+
  - BREAKING CHANGE
    do not create subfolder in targetDir named like sourceDir
 

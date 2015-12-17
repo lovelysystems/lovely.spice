@@ -48,10 +48,11 @@ class FolderRenderer(object):
             os.makedirs(parent)
 
     def _cleanupTarget(self):
-        for subdir in os.listdir(self.targetPath):
-            path = abspath(os.path.join(self.targetPath, subdir))
-            logger.debug('removing folder %s', path)
-            shutil.rmtree(path)
+        if os.path.exists(self.targetPath):
+            for subdir in os.listdir(self.targetPath):
+                path = abspath(os.path.join(self.targetPath, subdir))
+                logger.debug('removing folder %s', path)
+                shutil.rmtree(path, True)
 
 
 class FileRenderer(object):
