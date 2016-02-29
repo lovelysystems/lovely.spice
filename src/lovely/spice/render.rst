@@ -36,16 +36,20 @@ The template environment does also follow symlinks::
     ['one.ini', 'two.ini']
 
 the sencond required parameter for a Renderer is the context. A context can by
-loaded by the PyReader class::
+loaded by the PyReader class.
+
+..note:: If the context contains non-ascii characters it is required to define
+         the encoding of the context file by using 'magic comments'. For more
+         details see https://www.python.org/dev/peps/pep-0263/
 
     >>> cdir = tempfile.mkdtemp()
     >>> c = os.path.join(cdir, 'context.py')
     >>> with open(c, 'w+') as f:
-    ...     f.write('var = "eins"')
+    ...     f.write('# coding=utf8\nvar = u"fünf"')
 
     >>> context = render.PyReader.loadFile(c)
     >>> context
-    {'var': 'eins'}
+    {'var': u'f\xfcnf'}
 
 The renderer supports one public method called `render`. This method renders
 the template with the given name located in the initially given template
@@ -56,7 +60,7 @@ envinronment to the given target path::
     >>> renderer.render('one.ini', t)
     >>> with open(t, "r") as f:
     ...     f.read()
-    'one eins'
+    'one f\xc3\xbcnf'
 
 
 The FolderRenderer

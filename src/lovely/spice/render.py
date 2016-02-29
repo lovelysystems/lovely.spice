@@ -87,7 +87,7 @@ class Renderer(object):
         template = self.env.get_template(tempPath)
         with file(targetPath, 'w+') as f:
             logger.debug('generating %s', targetPath)
-            template.stream(self.context).dump(f)
+            template.stream(self.context).dump(f, 'utf8')
 
 
 class PyReader(object):
