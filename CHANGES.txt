@@ -2,6 +2,16 @@
 Changes for lovely.spice
 ========================
 
+2017/02/14 0.1.2
+================
+
+ - added package description
+
+2016/02/29 0.1.1
+================
+
+ - added encoding to dump call used in renderer
+
 2016/02/29 0.1.1
 ================
 
