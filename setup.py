@@ -40,6 +40,7 @@ requires = [
 
 setup(name='lovely.spice',
       version=VERSION,
+      description='A template renderer to generate files from given template path and given context file.',
       author='lovely',
       author_email='hello@lovelysystems.com',
       packages=find_packages('src'),
